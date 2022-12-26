@@ -45,7 +45,7 @@ class Utils
         $poly = 0x1021;
 
         $head = array_values(unpack('C*', $data)); // uint8array
-        $tail = array(0, 0); // two-byte prefix
+        $tail = array(0, 0); // two-byte suffix
 
         $bytes = array_merge($head, $tail);
         $reg = 0;
@@ -66,5 +66,5 @@ class Utils
         }
 
         return pack('CC', (int) floor($reg / 256), $reg % 256);
-    }   
+    }
 }

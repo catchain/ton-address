@@ -45,7 +45,7 @@ class Address
         if (strlen($this->hashPart) !== 32) {
             throw new Exception('Address hash part must be a 32-byte binary string');
         }
-        
+
         $this->isTestOnly = $isTestOnly;
         $this->isBounceable = $isBounceable;
         $this->isUserFriendly = $isUserFriendly;
