@@ -14,7 +14,7 @@ class Utils
         $encoded = base64_encode($data);
 
         if ($urlSafe) {
-            return strtr($encoded, '/+', '_-');
+            return strtr($encoded, '=/+', '-_-');
         }
 
         return $encoded;
@@ -40,31 +40,18 @@ class Utils
      * Telegram-flavored crc16 hashing.
      * @see https://github.com/toncenter/tonweb/blob/master/src/utils/Utils.js#L165
      */
-    public static function crc16(string $data): string
-    {
-        $poly = 0x1021;
-
-        $head = array_values(unpack('C*', $data)); // uint8array
-        $tail = array(0, 0); // two-byte suffix
-
-        $bytes = array_merge($head, $tail);
-        $reg = 0;
-
-        foreach ($bytes as $byte) {
-            $mask = 0x80;
-            while ($mask > 0) {
-                $reg = $reg << 1;
-                if ($byte & $mask) {
-                    $reg += 1;
-                }
-                $mask = $mask >> 1;
-                if ($reg > 0xffff) {
-                    $reg = $reg & 0xffff;
-                    $reg = $reg ^ $poly;
+    public static function crc16(string $data): string {
+        $crc = 0x0000;
+        for ($i = 0; $i < strlen($data); $i++) {
+            $crc ^= ord($data[$i]) << 8;
+            for ($j = 0; $j < 8; $j++) {
+                if ($crc & 0x8000) {
+                    $crc = ($crc << 1) ^ 0x1021;
+                } else {
+                    $crc = $crc << 1;
                 }
             }
         }
-
-        return pack('CC', (int) floor($reg / 256), $reg % 256);
+        return $crc & 0xFFFF;
     }
 }
